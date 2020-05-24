@@ -27,28 +27,72 @@ namespace Sample.IoC.Services
             return await _movieRepository.ListAsync();
         }
 
-        public async Task<ActionResult<Movie>> GetMovie(int id)
+        public async Task<MovieResponse> GetMovie(int id)
         {
-           return await _movieRepository.GetMovie(id);
+            var existingMovie = await _movieRepository.FindByIdAsync(id);
+
+            if (existingMovie == null)
+                return new MovieResponse("Movie not found.");
+
+            return new MovieResponse(existingMovie);
         }
 
-        public async Task<SaveMovieResponse> SaveAsync(Movie movie)
+        public async Task<MovieResponse> SaveAsync(Movie movie)
         {
             try
             {
                 await _movieRepository.AddAsync(movie);
                 await _unitOfWork.CompleteAsync();
-
-                return new SaveMovieResponse(movie);
+                
+                return new MovieResponse(movie);
             }
             catch (Exception ex)
             {
-                return new SaveMovieResponse($"An error occurred when saving the movie: {ex.Message}");
+                return new MovieResponse($"An error occurred when saving the movie: {ex.Message}");
             }
         }
-        public bool MovieExists(int id)
+
+        public async Task<MovieResponse> UpdateAsync(int id, Movie movie)
         {
-            return _movieRepository.MovieExists(id);
+            var existingMovie = await _movieRepository.FindByIdAsync(id);
+
+            if (existingMovie == null)
+                return new MovieResponse("Movie not found.");
+
+            existingMovie.Title = movie.Title;
+
+            try
+            {
+                _movieRepository.Update(existingMovie);   
+                await _unitOfWork.CompleteAsync();
+                
+                return new MovieResponse(existingMovie);
+            }
+            catch (Exception ex)
+            {
+                return new MovieResponse($"An error occurred when updating the movie: {ex.Message}");
+            }
+        }
+
+        public async Task<MovieResponse> DeleteAsync(int id)
+        {
+            var existingMovie = await _movieRepository.FindByIdAsync(id);
+
+            if (existingMovie == null)
+                return new MovieResponse("Category not found.");
+
+            try
+            {
+                _movieRepository.Remove(existingMovie);
+                await _unitOfWork.CompleteAsync();
+
+                return new MovieResponse(existingMovie);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new MovieResponse($"An error occurred when deleting the category: {ex.Message}");
+            }
         }
     }
 }

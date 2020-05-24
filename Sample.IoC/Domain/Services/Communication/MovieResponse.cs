@@ -2,11 +2,11 @@
 
 namespace Sample.IoC.Domain.Services.Communication
 {
-    public class SaveMovieResponse : BaseResponse
+    public class MovieResponse : BaseResponse
     {
         public Movie Movie { get; private set; }
 
-        private SaveMovieResponse(bool success, string message, Movie movie) : base(success, message)
+        private MovieResponse(bool success, string message, Movie movie) : base(success, message)
         {
             Movie = movie;
         }
@@ -16,7 +16,7 @@ namespace Sample.IoC.Domain.Services.Communication
         /// </summary>
         /// <param name="movie">Saved movie.</param>
         /// <returns>Response.</returns>
-        public SaveMovieResponse(Movie movie) : this(true, string.Empty, movie)
+        public MovieResponse(Movie movie) : this(true, string.Empty, movie)
         { }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Sample.IoC.Domain.Services.Communication
         /// </summary>
         /// <param name="message">Error message.</param>
         /// <returns>Response.</returns>
-        public SaveMovieResponse(string message) : this(false, message, null)
+        public MovieResponse(string message) : this(false, message, null)
         { }
     }
 }

@@ -10,10 +10,12 @@ namespace Sample.IoC.Domain.Interfaces
     {
         Task<IEnumerable<Movie>> ListAsync();
 
-        Task<ActionResult<Movie>> GetMovie(int id);
+        Task<MovieResponse> GetMovie(int id);
 
-        Task<SaveMovieResponse> SaveAsync(Movie movie);
+        Task<MovieResponse> SaveAsync(Movie movie);
 
-        public bool MovieExists(int id);
+        Task<MovieResponse> UpdateAsync(int id, Movie movie);
+
+        Task<MovieResponse> DeleteAsync(int id);
     }
 }

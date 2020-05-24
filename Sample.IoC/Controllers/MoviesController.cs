@@ -37,52 +37,35 @@ namespace Sample.IoC.Controllers
         }
         // GET: api/Movies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Movie>> GetMovie(int id)
+        public async Task<ActionResult> GetMovie(int id)
         {
-            var movie = await _movieService.GetMovie(id);
+            var result = await _movieService.GetMovie(id);
 
-            if (movie == null)
-            {
-                return NotFound();
-            }
+            if (!result.Success)
+              return BadRequest(result);
 
-            return movie;
+            return Ok(result);
         }
 
         // PUT: api/Movies/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        /*
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMovie(int id, Movie movie)
+        public async Task<IActionResult> PutMovie(int id, [FromBody] SaveMovieResource resource)
         {
-            if (id != movie.Id)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.GetErrorMessages());
 
-            _context.Entry(movie).State = EntityState.Modified;
+            var movie = _mapper.Map<SaveMovieResource, Movie>(resource);
+            var result = await _movieService.UpdateAsync(id, movie);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MovieExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            if (!result.Success)
+                return BadRequest(result);
 
-            return NoContent();
+            // var movieResource = _mapper.Map<Movie, MovieResource>(result.Movie);
+            return Ok(result);
         }
-
-            */
            
         // POST: api/Movies
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -98,38 +81,25 @@ namespace Sample.IoC.Controllers
             var result = await _movieService.SaveAsync(movie);
 
             if (!result.Success)
-                return BadRequest(result.Message);
+                return BadRequest(result);
 
-            var movieResource = _mapper.Map<Movie, MovieResource>(result.Movie);
-            return Ok(movieResource);
-
-            //await _movieService.PostMovie(movie);
-            //return CreatedAtAction("GetMovie", new { id = movie.Id }, movie);
+            return Ok(result);
         }
 
-        /*
+        
 
         // DELETE: api/Movies/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Movie>> DeleteMovie(int id)
+        public async Task<IActionResult> DeleteMovie(int id)
         {
-            var movie = await _context.Movie.FindAsync(id);
-            if (movie == null)
-            {
-                return NotFound();
-            }
+            var result = await _movieService.DeleteAsync(id);
 
-            _context.Movie.Remove(movie);
-            await _context.SaveChangesAsync();
+            if (!result.Success)
+                return BadRequest(result);
 
-            return movie;
+           //  var movieResource = _mapper.Map<Movie, MovieResource>(result.Movie);
+            return Ok(result);
         }
 
-        */
-
-        bool MovieExists(int id)
-        {
-            return _movieService.MovieExists(id);
-        }
     }
 }

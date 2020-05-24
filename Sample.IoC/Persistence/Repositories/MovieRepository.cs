@@ -22,19 +22,25 @@ namespace Sample.IoC.Persistence.Repositories
             return await _context.Movie.ToListAsync();
         }
 
-        public async Task<ActionResult<Movie>> GetMovie(int id)
-        {
-           return await _context.Movie.FindAsync(id);
-        }
-
+       
         public async Task AddAsync(Movie movie)
         {
             await _context.Movie.AddAsync(movie);
         }
 
-        public bool MovieExists(int id)
+        public async Task<Movie> FindByIdAsync(int id)
         {
-            return _context.Movie.Any(e => e.Id == id);
+            return await _context.Movie.FindAsync(id);
+        }
+
+        public void Update(Movie movie)
+        {
+            _context.Movie.Update(movie);
+        }
+
+        public void Remove(Movie movie)
+        {
+            _context.Movie.Remove(movie);
         }
     }
 }
