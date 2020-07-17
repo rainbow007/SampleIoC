@@ -8,16 +8,20 @@ using Sample.IoC.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sample.IoC.Domain.Services.Communication;
+using NRules;
 
 namespace Sample.IoC.Services
 {
     public class MovieService : IMovieService
     {
+        private readonly ISession _session;
+
         private readonly IMovieRepository _movieRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public MovieService(IMovieRepository movieRepository, IUnitOfWork unitOfWork)
+        public MovieService(IMovieRepository movieRepository, IUnitOfWork unitOfWork, ISession session)
         {
+            _session = session;
             _movieRepository = movieRepository;
             _unitOfWork = unitOfWork;
         }
@@ -41,6 +45,17 @@ namespace Sample.IoC.Services
         {
             try
             {
+               
+                _session.Insert(movie);
+
+                _session.Fire();
+
+                movie.First = true;
+
+                _session.Update(movie);
+
+                _session.Fire();
+
                 await _movieRepository.AddAsync(movie);
                 await _unitOfWork.CompleteAsync();
                 

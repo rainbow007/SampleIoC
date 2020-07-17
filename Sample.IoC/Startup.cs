@@ -15,6 +15,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Sample.IoC.Persistence.Contexts;
 using AutoMapper;
+using Sample.IoC.Nrule;
 
 namespace Sample.IoC
 {
@@ -42,7 +43,9 @@ namespace Sample.IoC
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
 
-    
+            services.AddNRules(AppDomain.CurrentDomain.GetAssemblies()) // Loads Rules from assemblies and Registers NRule with DI Container
+               .AddMvc();
+
             services.AddControllers();
 
             services.AddAutoMapper(typeof(Startup));
@@ -71,7 +74,7 @@ namespace Sample.IoC
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseNRules(); //Add the configured DI Container as the dependency resolver for Nrules
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
